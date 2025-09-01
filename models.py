@@ -65,9 +65,9 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), default=func.now())
 
-    transactions = relationship("Transaction", back_populates="user", foreign_keys='Transaction.user_id')
-    received_transactions = relationship("Transaction", back_populates="recipient", foreign_keys='Transaction.recipient_user_id')
-    sent_transactions = relationship("Transaction", back_populates="sender", foreign_keys='Transaction.sender_user_id')
+    transactions = relationship("Transaction", back_populates="user", foreign_keys="Transaction.user_id")
+    received_transactions = relationship("Transaction", back_populates="recipient", foreign_keys="Transaction.recipient_user_id")
+    sent_transactions = relationship("Transaction", back_populates="sender", foreign_keys="Transaction.sender_user_id")
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -82,9 +82,9 @@ class Transaction(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     related_transaction = relationship("Transaction", remote_side=[id], uselist=False)
 
-    user = relationship("User", back_populates="transactions", foreign_keys=[user_id])
-    recipient = relationship("User", back_populates="received_transactions", foreign_keys=[recipient_user_id])
-    sender = relationship("User", back_populates="sent_transactions", foreign_keys=[sender_user_id])
+    user = relationship("User", back_populates="transactions", foreign_keys="Transaction.user_id")
+    recipient = relationship("User", back_populates="received_transactions", foreign_keys="Transaction.recipient_user_id")
+    sender = relationship("User", back_populates="sent_transactions", foreign_keys="Transaction.sender_user_id")
     reference = relationship("Transaction", remote_side=[id], uselist=False)
 
          

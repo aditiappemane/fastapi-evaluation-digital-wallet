@@ -25,7 +25,7 @@ def create_user(db: Session, user: schemas.UserCreate) -> User:
         full_name=user.full_name,
         phone_number=user.phone_number,
         balance=user.initial_balance if user.initial_balance else 0.0,
-        password=user.password,
+        hashed_password=user.password,  # Note: In a real app, you should hash the password
         created_at=datetime.utcnow()
           
     )
@@ -128,14 +128,15 @@ def get_transactions(db: Session, user_id: int, skip: int = 0, limit: int = 10) 
 def get_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
     return db.query(Transaction).filter(Transaction.id == transaction_id).first()
 
-def create_transaction(db: Session, transaction: schemas.TransactionBase, user_id: int) -> Transaction:
+def create_transaction(db: Session, transaction: schemas.TransactionCreate, user_id: int) -> Transaction:
     db_transaction = Transaction(
-        user_id=user_id,
+        user_id=transaction.user_id,
         transaction_type=transaction.transaction_type,
         amount=transaction.amount,
         description=transaction.description,
         reference_transaction_id=transaction.reference_transaction_id,
         recipient_user_id=transaction.recipient_user_id,
+        sender_user_id=transaction.sender_user_id,
         created_at=datetime.utcnow()
     )
     db.add(db_transaction)
@@ -196,7 +197,6 @@ def transfer_money(db: Session, sender_id: int, recipient_id: int, amount: float
     db.commit()
     db.refresh(transfer_out)
     return transfer_out
-    return db_transaction
 
 
 "create end point tranfer moeny with transfer id"

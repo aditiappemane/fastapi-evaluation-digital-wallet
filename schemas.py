@@ -41,6 +41,8 @@ class UserUpdate(BaseModel):
 
 class User(UserBase):
     id: int
+    hashed_password: str
+    is_active: int
     balance: float
     created_at: datetime
     updated_at: datetime
@@ -57,7 +59,6 @@ class TransactionBase(BaseModel):
     reference_transaction_id: Optional[int] = None
     recipient_user_id: Optional[int] = None 
     sender_user_id: Optional[int] = None
-    created_at: Optional[datetime] = None
 
 class TransactionCreate(TransactionBase):
     user_id: int

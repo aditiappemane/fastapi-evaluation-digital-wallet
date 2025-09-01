@@ -61,15 +61,15 @@ def get_balance(user_id: int, db: Session = Depends(get_db)):
 "add money to wallet"
 
 @app.post("/wallet/{user_id}/add")
-def add_money(user_id: int, amount: float, db: Session = Depends(get_db)):
-    transaction = crud.add_money(db, user_id=user_id, amount=amount)
+def add_money(user_id: int, amount: float, description: Optional[str] = None, db: Session = Depends(get_db)):
+    transaction = crud.add_money(db, user_id=user_id, amount=amount, description=description)
     return {"message": "Money added successfully", "transaction": transaction}
 
 "withdraw money from wallet"
 
 @app.post("/wallet/{user_id}/withdraw")
-def withdraw_money(user_id: int, amount: float, db: Session = Depends(get_db)):
-    transaction = crud.withdraw_money(db, user_id=user_id, amount=amount)
+def withdraw_money(user_id: int, amount: float, description: Optional[str] = None, db: Session = Depends(get_db)):
+    transaction = crud.withdraw_money(db, user_id=user_id, amount=amount, description=description)
     return {"message": "Money withdrawn successfully", "transaction": transaction}
 
 "get the transaction of the user by userID using pagination"
@@ -93,20 +93,21 @@ def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
 
 @app.post("/transactions/", response_model=schemas.Transaction) 
 def create_transaction(transaction: schemas.TransactionCreate, db: Session = Depends(get_db)):
-    db_transaction = crud.create_transaction(db, transaction=transaction, user_id=transaction.user_id)
-    if not crud.get_user(db, user_id):
+    # Check if user exists
+    if not crud.get_user(db, user_id=transaction.user_id):
         raise HTTPException(status_code=404, detail="User not found")   
+    db_transaction = crud.create_transaction(db, transaction=transaction, user_id=transaction.user_id)
     return db_transaction
 
 "transfer money between users"
 
 "POST /transfer"
-@app.post("/transfer/", response_model=schemas.Transaction)
+@app.post("/transfer/")
 def transfer_money(sender_id: int, recipient_id: int, amount: float, description: Optional[str] = None, db: Session = Depends(get_db)):
     transaction = crud.transfer_money(db, sender_id=sender_id, recipient_id=recipient_id, amount=amount, description=description)
     if transaction is None:
         raise HTTPException(status_code=400, detail="Transfer failed")
-    return transaction
+    return {"message": "Transfer successful", "transaction": transaction}
 
 @app.get("/transfer/{transfer_id}", response_model=schemas.Transaction)
 def get_transfer(transfer_id: int, db: Session = Depends(get_db)):
