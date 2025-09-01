@@ -20,7 +20,7 @@ class TransactionType(str, enum.Enum):
     CHARGEBACK = "CHARGEBACK"
 
 
-    """User Schemas"""
+"""User Schemas"""
 
 class UserBase(BaseModel):
     username: str
@@ -44,13 +44,11 @@ class User(UserBase):
     balance: float
     created_at: datetime
     updated_at: datetime
-    pass
-
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-    """Transaction Schemas"""
+"""Transaction Schemas"""
 
 class TransactionBase(BaseModel):
     transaction_type: TransactionType
@@ -58,24 +56,16 @@ class TransactionBase(BaseModel):
     description: Optional[str] = None
     reference_transaction_id: Optional[int] = None
     recipient_user_id: Optional[int] = None 
-    created_at: Optional[datetime] = None
     sender_user_id: Optional[int] = None
-    recipient_user_id: Optional[int] = None
-    reference_transaction_id: Optional[int] = None
     created_at: Optional[datetime] = None
-    sender_user_id: Optional[int] = None
-    recipient_user_id: Optional[int] = None
 
 class TransactionCreate(TransactionBase):
-    pass
+    user_id: int
 
-class TransactionOut(TransactionBase):
+class Transaction(TransactionBase):
     id: int
     user_id: int
     created_at: datetime
-    sender_user_id: Optional[int] = None
-    recipient_user_id: Optional[int] = None
-    reference_transaction_id: Optional[int] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
