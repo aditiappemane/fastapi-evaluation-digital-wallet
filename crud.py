@@ -199,6 +199,52 @@ def transfer_money(db: Session, sender_id: int, recipient_id: int, amount: float
     return db_transaction
 
 
+"create end point tranfer moeny with transfer id"
+
+def transfer_money_with_reference(db: Session, sender_id: int, recipient_id: int, amount: float, reference_transaction_id: int, description: Optional[str] = None) -> Optional[Transaction]:
+    if amount <= 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Amount must be positive")
+    if sender_id == recipient_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot transfer to self")
+    sender = get_user(db, sender_id)
+    recipient = get_user(db, recipient_id)
+    if not sender or not recipient:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if sender.balance < amount:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient balance")
+    reference_transaction = get_transaction(db, reference_transaction_id)
+    if not reference_transaction:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reference transaction not found")
+    sender.balance -= amount
+    recipient.balance += amount
+    sender.updated_at = datetime.utcnow()
+    recipient.updated_at = datetime.utcnow()
+    transfer_out = Transaction(
+        user_id=sender_id,
+        transaction_type=TransactionType.TRANSFER_OUT,
+        amount=amount,
+        description=description or f"Transfer to user {recipient_id}",
+        recipient_user_id=recipient_id,
+        reference_transaction_id=reference_transaction_id,
+        created_at=datetime.utcnow()
+    )
+    transfer_in = Transaction(
+        user_id=recipient_id,
+        transaction_type=TransactionType.TRANSFER_IN,
+        amount=amount,
+        description=description or f"Transfer from user {sender_id}",
+        recipient_user_id=recipient_id,
+        sender_user_id=sender_id,
+        reference_transaction_id=reference_transaction_id,
+        created_at=datetime.utcnow()
+    )
+    db.add(transfer_out)
+    db.add(transfer_in)
+    db.commit()
+    db.refresh(transfer_out)
+    return transfer_out
+
+
 
 
 

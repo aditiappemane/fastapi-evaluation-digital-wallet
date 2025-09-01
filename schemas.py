@@ -39,11 +39,12 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     balance: Optional[float] = None
 
-class UserOut(UserBase):
+class User(UserBase):
     id: int
     balance: float
     created_at: datetime
     updated_at: datetime
+    pass
 
 
     class Config:
