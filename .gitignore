@@ -1,1 +1,41 @@
-.venv
+""
+
+__pycache__/
+*.pyc
+instance
+.env
+.DS_Store
+.vscode/
+.idea/
+migrations/
+alembic.ini
+
+
+# Ignore database files
+*.db
+*.sqlite3
+*.sqlite
+# Ignore logs and temp files
+*.log
+*.tmp
+# Ignore coverage reports
+htmlcov/
+.coverage
+.tox/
+# Ignore test and cache files
+.pytest_cache/
+.pytest_cache/*
+
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+
+# Ignore environment files
+.env
+.env.*
+
+./venv/
+.venv/
+# Ignore system files
+Thumbs.db
